@@ -1,22 +1,8 @@
-from tensorflow.keras.applications.mobilenet_v2 import (
-    MobileNetV2,
-    preprocess_input
-)
-
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
 from tensorflow.keras.preprocessing import image
-
 from sklearn.metrics.pairwise import cosine_similarity
-
-from PIL import Image
-
-from io import BytesIO
-
-import requests
-
 import numpy as np
-
 import pickle
-
 
 # Load MobileNet model
 model = MobileNetV2(
@@ -25,15 +11,10 @@ model = MobileNetV2(
     pooling='avg'
 )
 
-
 # Feature extraction function
-def extract_features(img_url):
+def extract_features(img_path):
 
-    response = requests.get(img_url)
-
-    img = Image.open(BytesIO(response.content))
-
-    img = img.resize((224, 224))
+    img = image.load_img(img_path, target_size=(224, 224))
 
     img_array = image.img_to_array(img)
 
@@ -44,3 +25,42 @@ def extract_features(img_url):
     features = model.predict(img_array)
 
     return features.flatten()
+
+
+# Load saved embeddings
+with open("embeddings.pkl", "rb") as f:
+
+    embeddings = pickle.load(f)
+
+
+# Query image
+query_image = "dataset/hoodie.jpg"
+
+query_features = extract_features(query_image)
+
+results = []
+
+# Compare query with saved embeddings
+for file, features in embeddings:
+
+    similarity = cosine_similarity(
+        [query_features],
+        [features]
+    )[0][0]
+
+    results.append((file, similarity))
+
+
+# Sort results
+results = sorted(
+    results,
+    key=lambda x: x[1],
+    reverse=True
+)
+
+# Print top matches
+print("\nAll Matches:\n")
+
+for file, score in results:
+
+    print(file, "->", score)
