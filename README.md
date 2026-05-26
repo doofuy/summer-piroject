@@ -1,2 +1,2 @@
-tm sbki mkc
-ja na lavde
+Badi jaldi yaad aagyi 
+Bhosdiii
