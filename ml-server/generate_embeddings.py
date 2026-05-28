@@ -26,7 +26,7 @@ def extract_local_features(img_path):
         return None
 
 def main():
-    dataset_dir = "dataset"
+    dataset_dir = "../dataset"
     if not os.path.exists(dataset_dir):
         os.makedirs(dataset_dir)
         print(f"Created '{dataset_dir}' directory.")
